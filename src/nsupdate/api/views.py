@@ -424,7 +424,7 @@ def _on_update_success(host, fqdn, kind, ipaddr, secure, logger):
             ifid = ifid.strip() if ifid else ifid
             _delete = not ifid  # leave ifid empty if you don't want this rh record
             try:
-                rh_fqdn = FQDN(rh.name + '.' + fqdn.host, fqdn.domain)
+                rh_fqdn = FQDN(rh.name, fqdn.domain)
                 if not _delete:
                     ifid = IPAddress(ifid)
                     network = IPNetwork("%s/%d" % (ipaddr, netmask))

@@ -385,11 +385,11 @@ class RelatedHost(models.Model):
         max_length=255,  # RFC 2181 (and considering having multiple joined labels here later)
         validators=[
             RegexValidator(
-                regex=r'^(([a-z0-9][a-z0-9\-]*[a-z0-9])|[a-z0-9])$',
+                regex=r'^(([a-z0-9][a-z0-9\-.]*[a-z0-9])|[a-z0-9])$',
                 message='Invalid host name: only "a-z", "0-9" and "-" is allowed'
             ),
         ],
-        help_text=_("The name of a host in same network as your main host."))
+        help_text=_("The name of a host in same zone as your main host."))
     comment = models.CharField(
         _("comment"),
         max_length=255,  # should be enough
@@ -418,7 +418,7 @@ class RelatedHost(models.Model):
         verbose_name=_("main host"))
 
     def __str__(self):
-        return u"%s.%s" % (self.name, str(self.main_host))
+        return u"%s.%s" % (self.name, str(self.main_host.get_fqdn().domain))
 
     class Meta(object):
         unique_together = (('name', 'main_host'),)
@@ -430,7 +430,7 @@ class RelatedHost(models.Model):
         main = self.main_host.get_fqdn()
         # note: we put the related hosts (subhosts) into same zone as the main host,
         # so the resulting hostname has a dot inside:
-        return dnstools.FQDN('%s.%s' % (self.name, main.host), main.domain)
+        return dnstools.FQDN(self.name, main.domain)
 
     def get_ip(self, kind):
         record = 'A' if kind == 'ipv4' else 'AAAA'
